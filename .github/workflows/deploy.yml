@@ -12,7 +12,7 @@ jobs:
           node-version: 16.x
           cache: 'npm'
       - name: Build application
-        run: npm build
+        run: npm run build
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
