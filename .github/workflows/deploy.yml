@@ -1,0 +1,29 @@
+name: build-and-deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up Node environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'npm'
+      - run: npm ci
+      - name: Build application
+        run: npm run build
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          name: practice-gh-action
+          known_hosts: 'placeholder'
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{secrets.SSH_HOST}} >> ~/.ssh/known_hosts
+      - name: Deploy with rsync
+        run: rsync -avz -e "ssh -i ~/.ssh/practice-gh-action" ./build/ ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}}:/var/www/html/practice.andrewhd.net/public_html
