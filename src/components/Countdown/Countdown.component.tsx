@@ -3,9 +3,12 @@ import './Countdown.component.css';
 
 var classNames = require('classnames');
 
-class Countdown extends Component {
-	constructor(props) {
-		super();
+class Countdown extends Component<CountdownProps, any> {
+	audio: HTMLAudioElement;
+	timer: any;
+
+	constructor(props: CountdownProps) {
+		super(props);
 		
 		this.state = {
 			timerOn: false,
@@ -16,9 +19,12 @@ class Countdown extends Component {
 		}
 		
 		this.audio = new Audio("audio/wind-chimes.mp3");
+		this.audio.loop = true;
 	}
 	
 	startTimer = () => {
+		this.audio.play();
+		this.audio.pause();
 		this.setState({
 			timerOn: true,
 			timerDead: Date.now() + this.state.timerTime
@@ -42,7 +48,10 @@ class Countdown extends Component {
 	};
 	
 	stopTimer = () => {
-		if (this.state.alarmOn) { this.audio.pause(); }
+		if (this.state.alarmOn) { 
+			this.audio.pause();
+			this.audio.currentTime = 0;
+		}
 		this.setState({
 			timerOn: false,
 			alarmOn: false
@@ -56,7 +65,7 @@ class Countdown extends Component {
 		}
 	};
 	
-	adjustTimer = input => {
+	adjustTimer = (input: string) => {
 		const { timerOn } = this.state;
 		let adjustment;
 		if (!timerOn) {
@@ -106,5 +115,7 @@ class Countdown extends Component {
 		);
 	}
 }
+
+type CountdownProps = {}
 
 export default Countdown;
