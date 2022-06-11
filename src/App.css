@@ -20,7 +20,14 @@
   grid-row: 1 / 2;
 }
 
+.Keys {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
 #showAbout {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
   height: 45px;
   width: 45px;
   justify-self: end;
