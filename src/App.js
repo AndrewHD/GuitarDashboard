@@ -16,8 +16,8 @@ class App extends Component {
 	handleCloseModal = () => {this.setState({ showModal: false });}
 	
 	componentDidMount() {
-    ReactModal.setAppElement('body');
- 	}
+		ReactModal.setAppElement('body');
+	}
  	
   render() {
 	  return (
