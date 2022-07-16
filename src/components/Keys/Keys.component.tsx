@@ -17,7 +17,8 @@ class Keys extends Component<null, any> {
 		this.state = {
 			key: Math.floor(Math.random() * (this.keys.length)),
 			mode: Math.floor(Math.random() * (this.modes.length)),
-			drone: false
+			drone: false,
+			gain: 0.5
 		}
 
 		this.audioCtx = new AudioContext();
@@ -32,33 +33,59 @@ class Keys extends Component<null, any> {
 		this.stopDrone();
 	}
 
-	startDrone = () => {
+	makeOscs = () => {
 		const { key, mode } = this.state;
 		const third = [5/4, 6/5]
 		const freqs = [0.5,1,third[mode],1.5,2,2 * third[mode],3];
+		let m = this.audioCtx.createGain();
+		m.gain.value = this.state.gain;
 		for (var i=0;i<freqs.length;i++) {
 			let o = this.audioCtx.createOscillator();
 			let g = this.audioCtx.createGain();
 			o.frequency.value = freqs[i] * this.fund[key];
 			o.connect(g);
 			g.gain.value = 1/freqs.length
-			g.connect(this.audioCtx.destination);
+			g.connect(m);
 			o.start(0);
 			this.oscs.push(o);
 		}
-		this.setState({ drone: true });
+		m.connect(this.audioCtx.destination);
 	}
-
-	stopDrone = () => {
+	
+	killOscs = () => {
 		for (var i=0;i<this.oscs.length;i++) {
 			this.oscs[i].stop(0);
 		}
 		this.oscs = [];
+	}
+	
+	startDrone = () => {
+		this.setState({ drone: true });
+	}
+
+	stopDrone = () => {
+		this.killOscs();
 		this.setState({ drone: false });
 	}
 	
+	lowerGain = () => {
+		this.killOscs();
+		if (this.state.gain > 0) {
+			this.setState({ gain: (this.state.gain - 0.1).toFixed(1) });
+		}
+	}
+	
+	raiseGain = () => {
+		if (this.state.gain < 1) {
+			this.killOscs();
+			let newGain = (parseFloat(this.state.gain) + 0.1).toFixed(1);
+			this.setState({ gain: newGain });
+		}
+	}
+	
 	render() {
-		let { key, mode, drone } = this.state;
+		let { key, mode, drone, gain } = this.state;
+		if (drone) { this.makeOscs(); }
 		return (
 			<div className="Keys">
 				<div className="Keys-display">
@@ -68,6 +95,11 @@ class Keys extends Component<null, any> {
 				<div className="Drone-buttons">
 					{!drone && (<button onClick={this.startDrone}>Start Drone</button>)}
 					{drone && (<button onClick={this.stopDrone}>Stop Drone</button>)}
+				</div>
+				<div className="Drone-gain">
+					<button onClick={this.lowerGain}>&larr;</button>
+					<span className="current-gain">{gain * 10}</span>
+					<button onClick={this.raiseGain}>&rarr;</button>
 				</div>
 			</div>
 		)
