@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import ReactSlider from 'react-slider';
 import './Metronome.component.css';
 
 class Metronome extends Component<MetronomeProps, any> {
@@ -14,7 +15,7 @@ class Metronome extends Component<MetronomeProps, any> {
 		this.state = {
 			position: 15,
 			isActive: false,
-			gain: 1
+			gain: 2
 		}
 		
 		this.tempos = [40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60,
@@ -98,13 +99,17 @@ class Metronome extends Component<MetronomeProps, any> {
 						<span className="current-tempo">{tempo}</span>
 						<button onClick={this.faster}>&rarr;</button>
 					</div>
-					<div className="Metronome-gain">
-						<button onClick={this.lowerGain}>&larr;</button>
-						<span className="current-gain">{gain}</span>
-						<button onClick={this.raiseGain}>&rarr;</button>
-					</div>
 					{!isActive && (<button onClick={this.startMetronome}>Start</button>)}
 					{isActive && (<button onClick={this.stopMetronome}>Stop</button>)}
+					<ReactSlider
+						value={gain}
+						className="horizontal-slider"
+						thumbClassName="slider-thumb"
+						trackClassName="slider-track"
+						max={10}
+						step={0.1}
+						onChange={(v,i) => this.setState({gain: v})}
+					/>
 				</div>
 			</div>
 		);
