@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import ReactSlider from 'react-slider';
 
 class Keys extends Component<null, any> {
 	keys: string[];
@@ -83,6 +84,11 @@ class Keys extends Component<null, any> {
 		}
 	}
 	
+	changeGain = (newGain: number) => {
+		this.killOscs();
+		this.setState({ gain: newGain });
+	}
+	
 	render() {
 		let { key, mode, drone, gain } = this.state;
 		if (drone) { this.makeOscs(); }
@@ -96,11 +102,15 @@ class Keys extends Component<null, any> {
 					{!drone && (<button onClick={this.startDrone}>Start Drone</button>)}
 					{drone && (<button onClick={this.stopDrone}>Stop Drone</button>)}
 				</div>
-				<div className="Drone-gain">
-					<button onClick={this.lowerGain}>&larr;</button>
-					<span className="current-gain">{gain * 10}</span>
-					<button onClick={this.raiseGain}>&rarr;</button>
-				</div>
+				<ReactSlider
+					value={gain}
+					className="horizontal-slider"
+					thumbClassName="slider-thumb"
+					trackClassName="slider-track"
+					max={0.7}
+					step={0.1}
+					onChange={(v,i) => this.changeGain(v)}
+				/>
 			</div>
 		)
 	}
