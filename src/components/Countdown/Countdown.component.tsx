@@ -13,6 +13,8 @@ class Countdown extends Component<CountdownProps, any> {
 		this.state = {
 			timerOn: false,
 			alarmOn: false,
+			mins: null,
+			secs: null,
 			timerStart: 0,
 			timerTime: 0,
 			timerDead: 0
@@ -25,6 +27,7 @@ class Countdown extends Component<CountdownProps, any> {
 	startTimer = () => {
 		this.audio.play();
 		this.audio.pause();
+		
 		this.setState({
 			timerOn: true,
 			timerDead: Date.now() + this.state.timerTime
@@ -54,15 +57,23 @@ class Countdown extends Component<CountdownProps, any> {
 		}
 		this.setState({
 			timerOn: false,
-			alarmOn: false
+			alarmOn: false,
+			timerStart: 0
 		});
 		clearInterval(this.timer);
 	};
 	
-	clearTimer = () => {
-		if (this.state.timerOn === false) {
-			this.setState({ timerTime: 0 });
-		}
+	handleChange = (event: any) => {
+		let { mins, secs } = this.state;
+		if (event.target.name === "mins") { mins = event.target.value; }
+		if (event.target.name === "secs") { secs = event.target.value; }
+		const newTime = (mins * 60000) + (secs * 1000);
+		this.setState({
+			mins: mins,
+			secs: secs,
+			timerTime: newTime,
+			timerStart: newTime
+		})
 	};
 	
 	adjustTimer = (input: string) => {
@@ -80,7 +91,7 @@ class Countdown extends Component<CountdownProps, any> {
 	};
 
 	render() {
-		const { timerOn, alarmOn, timerTime, timerStart } = this.state;
+		const { timerOn, alarmOn, timerTime, timerStart, mins, secs } = this.state;
 		let sec = ("0" + (Math.floor(timerTime / 1000) % 60)).slice(-2);
 		let min = ("0" + (Math.floor(timerTime / 60000) % 60)).slice(-2);
 		let hr = ("0" + Math.floor(timerTime / 3600000)).slice(-2);
@@ -92,14 +103,19 @@ class Countdown extends Component<CountdownProps, any> {
 			<div className={displayClass}>
 				<div className="Countdown-header">Countdown</div>
 				<div className="Countdown-display">
+					{(timerOn === true || timerTime !== timerStart) && (
 					<div className="Countdown-timer">
 						{hr} : {min} : {sec}
 					</div>
-					<button onClick={() => this.adjustTimer("10sec")}>10 seconds</button>
-					<button onClick={() => this.adjustTimer("3min")}>3 minutes</button>
-					<button onClick={() => this.adjustTimer("5min")}>5 minutes</button>
+					)}
+					{timerOn === false && alarmOn === false && (
+					<div className="Countdown-btns">
+						<input type="number" name="mins" min="0" onChange={this.handleChange} className="Countdown-input" placeholder="mm" id="mins" value={mins}/> :
+						<input type="number" name="secs" min="0" max="59" onChange={this.handleChange} className="Countdown-input" placeholder="ss" id="secs" value={secs} /><br />
+					</div>
+					)}
 				</div>
-				{timerOn === false && timerTime === timerStart && (
+				{timerOn === false && alarmOn === false && (timerTime === timerStart || timerTime === 0) && (
 					<button onClick={this.startTimer}>Start</button>
 				)}
 				{(timerOn === true || alarmOn === true) && (
@@ -107,9 +123,6 @@ class Countdown extends Component<CountdownProps, any> {
 				)}
 				{timerOn === false && timerTime !== 0 && timerTime !== timerStart && (
 					<button onClick={this.startTimer}>Resume</button>
-				)}
-				{timerOn === false && timerTime > 0 && (
-					<button onClick={this.clearTimer}>Clear</button>
 				)}
 			</div>
 		);

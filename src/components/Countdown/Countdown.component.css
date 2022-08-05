@@ -1,3 +1,15 @@
 .AlarmRing {
 	color: red
 }
+
+.Countdown-input {
+	font-size: 14px;
+	width: 2em;
+	text-align: center;
+}
+
+.Countdown-input::-webkit-inner-spin-button,
+.Countdown-input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
